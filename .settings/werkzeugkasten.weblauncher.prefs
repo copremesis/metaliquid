@@ -1,0 +1,5 @@
+baseDir=/simple-service
+contextName=/simple-service
+eclipse.preferences.version=1
+useInternalWebBrowser=true
+webType=Jetty8.0
