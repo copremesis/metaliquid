@@ -5,8 +5,6 @@ import com.xeiam.xchange.dto.Order.OrderType;
 import com.xeiam.xchange.dto.marketdata.OrderBook;
 import com.xeiam.xchange.dto.trade.LimitOrder;
 
-import org.sqlite.JDBC;
-
 public class J2Sql implements Runnable  {
 	
 	public J2Sql(OrderBook book, String exchange) {
@@ -19,18 +17,18 @@ public class J2Sql implements Runnable  {
 	private String _exchange;
 	
 	public void connect() {
-		String url = "jdbc:sqlite:";
-		String dbName = _exchange+".db";
-		String driver = "org.sqlite.JDBC";
-		String userName = "";
-		String password = "";
+		String url = "jdbc:mysql://localhost/";
+		String dbName = "metaliquid";
+		String driver = "com.mysql.jdbc.Driver";
+		String userName = "root";
+		String password = "sesufika";
 		
 		try {
 			 System.out.println("SQL + connecting " +  _exchange );
 			Class.forName(driver).newInstance();
 			if (conn == null)
 				System.out.println("SQL + connecting FAIL " +  _exchange );
-				conn = DriverManager.getConnection(url+dbName,userName,password);			
+				conn = DriverManager.getConnection(url+dbName,userName,password);
 			
 		} catch (Exception e){
 			e.printStackTrace();
@@ -61,8 +59,11 @@ public class J2Sql implements Runnable  {
 		try {		
 			System.out.println("SQL + inserting orderbook " +  _exchange );
 			int id = InsertBook(_book, _exchange); 
-			InsertOrder(_book, OrderType.ASK, id);
-			InsertOrder(_book, OrderType.BID, id);
+			if (id != -1) {
+				InsertOrder(_book, OrderType.ASK, id);
+				InsertOrder(_book, OrderType.BID, id);
+			} else 
+				System.out.println("----------SKIPPING--------"+_book.getTimeStamp());
 			
 		} catch (Exception e){
 			System.out.println("SQL + inserting orderbook FAIL " +  _exchange );
@@ -73,16 +74,17 @@ public class J2Sql implements Runnable  {
 	
 	public int InsertBook(OrderBook book, String exchange) throws SQLException {
 		connect();
-		String bookQuery = "insert into book (timeStamp, exchange) values (?, ?)";
+		String bookQuery = "insert into metaliquid.book (timeStamp, exchange) values (?, ?)";
 		int bookId = 0;
-		
+		if (!Unique(book,exchange))
+			return -1;
 		try {
 			System.out.println("SQL + inserting book " +  _exchange );
-			PreparedStatement preparedStmt = conn.prepareStatement(bookQuery);
-			preparedStmt.setDate(1, new java.sql.Date(book.getTimeStamp().getTime()));
+			PreparedStatement preparedStmt = conn.prepareStatement(bookQuery,Statement.RETURN_GENERATED_KEYS);
+			preparedStmt.setString(1, book.getTimeStamp().toString());
 			preparedStmt.setString(2, exchange);
 			preparedStmt.execute();
-			
+			System.out.println(preparedStmt);
 			try (ResultSet generatedKeys = preparedStmt.getGeneratedKeys()) {
 	            if (generatedKeys.next()) {
 	                bookId = generatedKeys.getInt(1);
@@ -93,17 +95,27 @@ public class J2Sql implements Runnable  {
 	            }
 	        }
 		} catch (SQLException e) {
+			
 			System.out.println("SQL + inserting book FAIL " +  _exchange );
 			e.printStackTrace();
 		}
 		return bookId;
 		
 	}
+	private boolean Unique(OrderBook book, String exchange) throws SQLException {
+		Statement stmt = conn.createStatement();
+        ResultSet rs;
+
+        rs = stmt.executeQuery("SELECT * from metaliquid.book where timestamp = '"+ book.getTimeStamp().toString()+"' AND exchange = '"+exchange+"'");
+        System.out.println(!rs.next());
+        return !rs.next();
+	}
+
 	public void InsertOrder(OrderBook book, OrderType type, int bookId) throws SQLException {
 		//Insert Order Statement
 		connect();
 		int CurrencyPairId = 1;
-		String orderQuery = "insert into 'order' (bookId, type, tradableAmount, currencyPair, id, timestamp, limitPrice) values (?, ?, ?, ?, ?, ?, ?)";
+		String orderQuery = "insert into metaliquid.order (bookId, type, tradableAmount, currencyPair, pairId, timestamp, limitPrice) values (?, ?, ?, ?, ?, ?, ?)";
 	    for(LimitOrder order : book.getOrders(type)) {
 	    	PreparedStatement preparedStmt;
 			try {
@@ -121,7 +133,9 @@ public class J2Sql implements Runnable  {
 		        else
 		        	preparedStmt.setString(6, "");
 		        preparedStmt.setBigDecimal(7, order.getLimitPrice());
+		        //System.out.println(preparedStmt);
 		        preparedStmt.execute();
+		        
 				} catch (SQLException e) {
 					e.printStackTrace();
 				}	    	
