@@ -39,7 +39,7 @@ public class Main {
     	DbThread bitfinexThread = new DbThread( bitfinex.class);
     	DbThread bitvcThread = new DbThread( bitvc.class);
     	DbThread okcoinThread = new DbThread( okcoin.class);
-    	
+
     	bitstampThread.start();
     	bitfinexThread.start();
     	bitvcThread.start();
