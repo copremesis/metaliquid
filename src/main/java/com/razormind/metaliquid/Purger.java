@@ -7,7 +7,7 @@ package com.razormind.metaliquid;
 public class Purger extends Thread {
 
 	private J2Sql sql = new J2Sql();
-	private int maxDocs = 1000;
+	private int maxDocs = 2000;
 	private int purge = 100;
 
 	public Purger() {
