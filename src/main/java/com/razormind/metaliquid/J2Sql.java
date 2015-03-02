@@ -142,4 +142,35 @@ public class J2Sql {
 			}
 		}
 	}
+
+	public void purge(int max, int purgeCount) {
+		String countQuery = "select exchange, count(*) cnt from metaliquid.book group by exchange";
+		try {
+			Statement st = conn.createStatement();
+			ResultSet rs = st.executeQuery(countQuery);
+
+			while (rs.next()) {
+				int count = rs.getInt("cnt");
+				String exchange = rs.getString("exchange");
+
+				if (count > max) {
+					// System.out.println(exchange + ":" + count);
+
+					System.out.println("=====> Removing top " + purgeCount
+							+ " rows for exchange=" + exchange);
+
+					String deleteQuery = "DELETE from `book` where exchange = ? limit ?";
+					PreparedStatement preparedStmt = conn
+							.prepareStatement(deleteQuery);
+					preparedStmt.setString(1, exchange);
+					preparedStmt.setInt(2, purgeCount);
+
+					preparedStmt.execute();
+				}
+			}
+
+		} catch (Exception e) {
+			e.printStackTrace();
+		}
+	}
 }
