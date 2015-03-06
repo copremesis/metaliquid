@@ -37,17 +37,17 @@ public class Main {
      * @throws IOException
      */
     public static void main(String[] args) throws IOException {
-//    	DbThread bitstampThread = new DbThread( bitstamp.class);
-//    	DbThread bitfinexThread = new DbThread( bitfinex.class);
-//    	DbThread bitvcThread = new DbThread( bitvc.class);
-//    	DbThread okcoinThread = new DbThread( okcoin.class);
-//    	Purger purgeThread = new Purger();
-//    	
-//    	purgeThread.start();
-//    	bitstampThread.start();
-//    	bitfinexThread.start();
-//    	bitvcThread.start();
-//    	okcoinThread.start();
+    	DbThread bitstampThread = new DbThread( bitstamp.class);
+    	DbThread bitfinexThread = new DbThread( bitfinex.class);
+    	DbThread bitvcThread = new DbThread( bitvc.class);
+    	DbThread okcoinThread = new DbThread( okcoin.class);
+    	Purger purgeThread = new Purger();
+    	
+    	purgeThread.start();
+    	bitstampThread.start();
+    	bitfinexThread.start();
+    	bitvcThread.start();
+    	okcoinThread.start();
     	
         final HttpServer server = startServer();
         System.out.println(String.format("Jersey app started with WADL available at "
