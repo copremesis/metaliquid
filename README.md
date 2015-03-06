@@ -46,10 +46,18 @@ Example: /stats/book/query?q=select * from metaliquid.order limit 10
 Example: /stats/book/10
 ```
 {
-  count: 300,
-  max: 1668.5,
-  mean: 1640.988233333333,
-  min: 1613.45
+   ask: {
+      count: 150,
+      max: 1669,
+      mean: 1653.8524666666667,
+      min: 1640.24
+   },
+   bid: {
+      count: 150,
+      max: 1639.14,
+      mean: 1628.6680000000001,
+      min: 1614.52
+   }
 }
 ```
 
