@@ -1,8 +1,6 @@
 package com.razormind.metaliquid.api;
 
-import java.util.HashMap;
 import java.util.List;
-import java.util.Map;
 
 import javax.ws.rs.GET;
 import javax.ws.rs.Path;
@@ -28,7 +26,7 @@ public class StatsController {
 	@GET
 	@Produces(MediaType.APPLICATION_JSON)
 	@Path("/book/{id}")
-	public AllStats bookStats(@PathParam("id") String id) {
+	public AllStats bookStats(@PathParam("id") String id) throws Exception {
 		J2Sql sql = J2Sql.getInstance();
 		Stats ask = computeDescriptiveStats(sql.fetchOrders("ASK", id));
 		Stats bid = computeDescriptiveStats(sql.fetchOrders("BID", id));

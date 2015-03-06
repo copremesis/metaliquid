@@ -1,5 +1,7 @@
 package com.razormind.metaliquid.api;
 
+import javax.xml.bind.annotation.XmlRootElement;
+
 public class Stats {
 	
 	double mean = 0;

@@ -3,9 +3,11 @@ package com.razormind.metaliquid.api;
 
 class AllStats {
 
-	private Stats bid;
-	private Stats ask;
+	Stats bid;
+	Stats ask;
 
+	public AllStats() { }
+	
 	public AllStats(Stats bid, Stats ask) {
 		this.bid = bid;
 		this.ask = ask;
@@ -25,5 +27,10 @@ class AllStats {
 
 	public void setAsk(Stats ask) {
 		this.ask = ask;
+	}
+	
+	@Override
+	public String toString() {
+		return "AllStats [bid=" + bid + ", ask=" + ask + "]";
 	}
 }
