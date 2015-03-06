@@ -1,7 +1,10 @@
 package com.razormind.metaliquid;
 
 import java.sql.*;
+import java.util.ArrayList;
+import java.util.List;
 
+import com.google.gson.JsonObject;
 import com.xeiam.xchange.dto.Order.OrderType;
 import com.xeiam.xchange.dto.marketdata.OrderBook;
 import com.xeiam.xchange.dto.trade.LimitOrder;
@@ -141,5 +144,84 @@ public class J2Sql {
 				e.printStackTrace();
 			}
 		}
+	}
+
+	public void purge(int max, int purgeCount) {
+		String countQuery = "select exchange, count(*) cnt from metaliquid.book group by exchange";
+		try {
+			Statement st = conn.createStatement();
+			ResultSet rs = st.executeQuery(countQuery);
+
+			while (rs.next()) {
+				int count = rs.getInt("cnt");
+				String exchange = rs.getString("exchange");
+
+				if (count > max) {
+					// System.out.println(exchange + ":" + count);
+
+					System.out.println("=====> Removing top " + purgeCount
+							+ " rows for exchange=" + exchange);
+
+					String deleteQuery = "DELETE from `book` where exchange = ? limit ?";
+					PreparedStatement preparedStmt = conn
+							.prepareStatement(deleteQuery);
+					preparedStmt.setString(1, exchange);
+					preparedStmt.setInt(2, purgeCount);
+
+					preparedStmt.execute();
+				}
+			}
+
+		} catch (Exception e) {
+			e.printStackTrace();
+		}
+	}
+	
+	public List<String> runQuery(String query) {
+		List<String> results = new ArrayList<String>();
+		try {
+			Statement st = conn.createStatement();
+			ResultSet rs = st.executeQuery(query);
+			while (rs.next()) {
+				JsonObject obj = new JsonObject();
+				for (int i = 1; i < rs.getMetaData().getColumnCount(); i++) {
+					obj.addProperty(rs.getMetaData().getColumnName(i).toString(), rs.getObject(i).toString());
+				}
+				results.add(obj.toString());
+			}
+		} catch (Exception e) {
+			e.printStackTrace();
+		}
+//		System.out.println(results);
+		return results;
+	}
+
+	public List<Double> fetchOrders(String type, String id) {
+		List<Double> prices = new ArrayList<Double>();
+		String query = "select limitPrice from metaliquid.order where bookId="
+				+ id + " and type='" + type.toUpperCase() + "'";
+		try {
+			Statement st = conn.createStatement();
+			ResultSet rs = st.executeQuery(query);
+			while (rs.next()) {
+				double price = rs.getDouble("limitPrice");
+				prices.add(price);
+			}
+		} catch (Exception e) {
+			e.printStackTrace();
+		}
+		return prices;
+	}
+
+	/* Create a singleton interface for the controller */
+	private static J2Sql j2Sql = new J2Sql();
+
+	public static J2Sql getInstance() {
+		if (j2Sql == null) {
+			synchronized (J2Sql.class) {
+				j2Sql = new J2Sql();
+			}
+		}
+		return j2Sql;
 	}
 }
