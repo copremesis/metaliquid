@@ -62,8 +62,13 @@ public class J2Sql {
 			System.out.println("SQL + inserting orderbook FAIL " + _exchange);
 			e.printStackTrace();
 		}
+		freememory();
+		freememory();
 	}
-
+	public void freememory(){
+	    Runtime basurero = Runtime.getRuntime(); 
+	    basurero.gc();
+	}
 	private int InsertBook(OrderBook book, String exchange) throws SQLException {
 		String bookQuery = "insert into metaliquid.book (timeStamp, exchange) values (?, ?)";
 		int bookId = 0;
@@ -126,10 +131,11 @@ public class J2Sql {
 				preparedStmt.setString(2, type.toString());
 				preparedStmt.setBigDecimal(3, order.getTradableAmount());
 				preparedStmt.setInt(4, CurrencyPairId);
-				if (order.getId() != null) {
-					preparedStmt.setString(5, order.getId());
+				String id = order.getId();
+				if (id != null && id != "" ) {
+					preparedStmt.setInt(5, Integer.parseInt(order.getId()));
 				} else {
-					preparedStmt.setString(5, "");
+					preparedStmt.setInt(5, 0);
 				}
 				if (order.getTimestamp() != null) {
 					preparedStmt.setString(6, order.getTimestamp().toString());

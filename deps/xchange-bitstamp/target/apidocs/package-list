@@ -1,9 +1,0 @@
-com.xeiam.xchange.bitstamp
-com.xeiam.xchange.bitstamp.dto
-com.xeiam.xchange.bitstamp.dto.account
-com.xeiam.xchange.bitstamp.dto.marketdata
-com.xeiam.xchange.bitstamp.dto.trade
-com.xeiam.xchange.bitstamp.service
-com.xeiam.xchange.bitstamp.service.polling
-com.xeiam.xchange.bitstamp.service.streaming
-com.xeiam.xchange.bitstamp.util

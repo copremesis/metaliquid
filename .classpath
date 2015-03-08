@@ -47,13 +47,12 @@
 	<classpathentry exported="true" kind="lib" path="build/rest_lib/gson-2.2.2.jar"/>
 	<classpathentry exported="true" kind="lib" path="build/rest_lib/hamcrest-core-1.3.jar"/>
 	<classpathentry exported="true" kind="lib" path="build/rest_lib/jackson-annotations-2.4.0.jar"/>
+	<classpathentry kind="lib" path="C:/Development/metaliquid/xchange-bitfinex-2.2.0-SNAPSHOT.jar"/>
+	<classpathentry kind="lib" path="C:/Development/metaliquid/xchange-bitstamp-2.2.0-SNAPSHOT.jar"/>
+	<classpathentry kind="lib" path="C:/Development/metaliquid/xchange-bitvc-2.2.0-SNAPSHOT.jar"/>
+	<classpathentry kind="lib" path="C:/Development/metaliquid/xchange-okcoin-2.2.0-SNAPSHOT.jar"/>
+	<classpathentry kind="lib" path="C:/Development/metaliquid/mysql-connector-java-5.0.8-bin.jar"/>
 	<classpathentry kind="src" output="target/classes" path="src/main/java">
-		<attributes>
-			<attribute name="optional" value="true"/>
-			<attribute name="maven.pomderived" value="true"/>
-		</attributes>
-	</classpathentry>
-	<classpathentry kind="src" output="target/test-classes" path="src/test/java">
 		<attributes>
 			<attribute name="optional" value="true"/>
 			<attribute name="maven.pomderived" value="true"/>
