@@ -1,0 +1,7 @@
+com.xeiam.xchange.bitfinex.v1
+com.xeiam.xchange.bitfinex.v1.dto
+com.xeiam.xchange.bitfinex.v1.dto.account
+com.xeiam.xchange.bitfinex.v1.dto.marketdata
+com.xeiam.xchange.bitfinex.v1.dto.trade
+com.xeiam.xchange.bitfinex.v1.service
+com.xeiam.xchange.bitfinex.v1.service.polling

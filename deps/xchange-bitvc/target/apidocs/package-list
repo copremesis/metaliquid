@@ -1,0 +1,7 @@
+com.xeiam.xchange.bitvc
+com.xeiam.xchange.bitvc.dto.account
+com.xeiam.xchange.bitvc.dto.marketdata
+com.xeiam.xchange.bitvc.dto.trade
+com.xeiam.xchange.bitvc.service
+com.xeiam.xchange.bitvc.service.polling
+com.xeiam.xchange.huobi.service.polling

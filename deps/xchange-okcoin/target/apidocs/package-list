@@ -1,0 +1,5 @@
+com.xeiam.xchange.okcoin
+com.xeiam.xchange.okcoin.dto.account
+com.xeiam.xchange.okcoin.dto.marketdata
+com.xeiam.xchange.okcoin.dto.trade
+com.xeiam.xchange.okcoin.service.polling
