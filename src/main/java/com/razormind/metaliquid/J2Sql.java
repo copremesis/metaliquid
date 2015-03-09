@@ -188,9 +188,12 @@ public class J2Sql {
 		try {
 			Statement st = conn.createStatement();
 			ResultSet rs = st.executeQuery(query);
+			System.out.println("==============================");
+			System.out.println(rs.toString());
+			System.out.println("==============================");
 			while (rs.next()) {
 				JsonObject obj = new JsonObject();
-				for (int i = 1; i < rs.getMetaData().getColumnCount(); i++) {
+				for (int i = 1; i <= rs.getMetaData().getColumnCount(); i++) {
 					obj.addProperty(rs.getMetaData().getColumnName(i).toString(), rs.getObject(i).toString());
 				}
 				results.add(obj.toString());
@@ -198,7 +201,7 @@ public class J2Sql {
 		} catch (Exception e) {
 			e.printStackTrace();
 		}
-//		System.out.println(results);
+		System.out.println(results);
 		return results;
 	}
 
@@ -229,5 +232,31 @@ public class J2Sql {
 			}
 		}
 		return j2Sql;
+	}
+	
+
+	public String emptyBook() throws SQLException {
+		Main.threads.forEach((thread) -> thread.stop());		
+		String deleteQuery = "DELETE from `book` where id != -1";
+		PreparedStatement preparedStmt = conn.prepareStatement(deleteQuery);
+
+		preparedStmt.execute();	
+	
+		Main.threads.forEach((thread) -> thread.start());
+		return "{success: 'ok'}";	
+	}
+
+	public String emptyOrder() throws SQLException {
+		Main.threads.forEach((thread) -> thread.stop());
+		String deleteQuery = "DELETE from `metaliquid`.`order` where id != -1";
+		Statement stmt = conn.createStatement();
+		int rs;
+		try {
+		rs = stmt.executeUpdate(deleteQuery); } catch(Exception e) {
+			String err = e.getMessage();			
+		}
+	
+		Main.threads.forEach((thread) -> thread.start());
+		return "{success: 'ok'}";
 	}
 }
