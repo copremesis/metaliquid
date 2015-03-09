@@ -5,6 +5,7 @@ import java.util.ArrayList;
 import java.util.List;
 
 import com.google.gson.JsonObject;
+import com.xeiam.xchange.currency.CurrencyPair;
 import com.xeiam.xchange.dto.Order.OrderType;
 import com.xeiam.xchange.dto.marketdata.OrderBook;
 import com.xeiam.xchange.dto.trade.LimitOrder;
@@ -47,13 +48,13 @@ public class J2Sql {
 	 * @param _book
 	 * @param _exchange
 	 */
-	public synchronized void InsertOrderBook(OrderBook _book, String _exchange) {
+	public synchronized void InsertOrderBook(OrderBook _book, String _exchange, CurrencyPair pair) {
 		try {
 			System.out.println("SQL + inserting orderbook for " + _exchange);
-			int id = InsertBook(_book, _exchange);
+			int id = InsertBook(_book, _exchange, pair);
 			if (id != -1) {
-				InsertOrder(_book, OrderType.ASK, id);
-				InsertOrder(_book, OrderType.BID, id);
+				InsertOrder(_book, OrderType.ASK, id, pair);
+				InsertOrder(_book, OrderType.BID, id, pair);
 			} else {
 				System.out.println("----------SKIPPING--------"
 						+ _book.getTimeStamp() + ", " + _exchange);
@@ -69,8 +70,8 @@ public class J2Sql {
 	    Runtime basurero = Runtime.getRuntime(); 
 	    basurero.gc();
 	}
-	private int InsertBook(OrderBook book, String exchange) throws SQLException {
-		String bookQuery = "insert into metaliquid.book (timeStamp, exchange) values (?, ?)";
+	private int InsertBook(OrderBook book, String exchange, CurrencyPair pair) throws SQLException {
+		String bookQuery = "insert into metaliquid.book (timeStamp, exchange, pair) values (?, ?, ?)";
 		int bookId = 0;
 		if (!Unique(book, exchange))
 			return -1;
@@ -80,6 +81,7 @@ public class J2Sql {
 					Statement.RETURN_GENERATED_KEYS);
 			preparedStmt.setString(1, book.getTimeStamp().toString());
 			preparedStmt.setString(2, exchange);
+			preparedStmt.setString(3, pair.toString());
 			preparedStmt.execute();
 			System.out.println(preparedStmt);
 			try (ResultSet generatedKeys = preparedStmt.getGeneratedKeys()) {
@@ -118,10 +120,8 @@ public class J2Sql {
 		return true;
 	}
 
-	private void InsertOrder(OrderBook book, OrderType type, int bookId)
+	private void InsertOrder(OrderBook book, OrderType type, int bookId, CurrencyPair pair)
 			throws SQLException {
-		// Insert Order Statement
-		int CurrencyPairId = 1;
 		String orderQuery = "insert into metaliquid.order (bookId, type, tradableAmount, currencyPair, pairId, timestamp, limitPrice) values (?, ?, ?, ?, ?, ?, ?)";
 		for (LimitOrder order : book.getOrders(type)) {
 			PreparedStatement preparedStmt = null;
@@ -130,7 +130,7 @@ public class J2Sql {
 				preparedStmt.setInt(1, bookId);
 				preparedStmt.setString(2, type.toString());
 				preparedStmt.setBigDecimal(3, order.getTradableAmount());
-				preparedStmt.setInt(4, CurrencyPairId);
+				preparedStmt.setString(4, pair.toString());
 				String id = order.getId();
 				if (id != null && id != "" ) {
 					preparedStmt.setInt(5, Integer.parseInt(order.getId()));
