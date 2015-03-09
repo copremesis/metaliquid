@@ -51,6 +51,11 @@ public class BitVc {
 		return orderBook;
 	}
 	
+	public static boolean PlaceOrder(CurrencyPair pair) {
+		
+		return false;		
+	}
+	
 	
 }
 

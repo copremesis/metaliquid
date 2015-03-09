@@ -23,8 +23,9 @@ public class OkCoin {
 		OrderBook orderBook = marketDataService.getOrderBook(pair);
 		return orderBook;
 	}
-	
-	 public static void main(String[] args) throws IOException {
-		 GetOrderBook(CurrencyPair.BTC_USD);
-	 }	 
+		 
+	 public static boolean PlaceOrder(CurrencyPair pair) {
+			
+			return false;		
+		}
 }

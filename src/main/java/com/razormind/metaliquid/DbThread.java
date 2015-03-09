@@ -1,18 +1,8 @@
 package com.razormind.metaliquid;
 
-import java.io.BufferedReader;
-import java.io.ByteArrayOutputStream;
-import java.io.File;
 import java.io.IOException;
-import java.io.InputStream;
-import java.io.InputStreamReader;
-import java.io.Reader;
-import java.net.URISyntaxException;
 
-import org.apache.commons.io.IOUtils;
-import org.glassfish.grizzly.streams.StreamReader;
-
-import com.razormind.metaliquid.api.StreamGobbler;
+import com.xeiam.xchange.currency.CurrencyPair;
 import com.xeiam.xchange.dto.marketdata.OrderBook;
 
 class DbThread implements Runnable {
@@ -22,6 +12,7 @@ class DbThread implements Runnable {
 	IExchangeRequest exchange = null;
 	private J2Sql j2sql;
 	
+	@SuppressWarnings("unchecked")
 	DbThread(Class<?> class1) {
 		threadTarget = (Class<IExchangeRequest>) class1;
 		j2sql = new J2Sql();
@@ -38,7 +29,7 @@ class DbThread implements Runnable {
 					exchange = (IExchangeRequest) Class.forName(
 							threadTarget.getName()).newInstance();
 				}
-				OrderBook data = exchange.getOrderBookObj();
+				OrderBook data = exchange.getOrderBookForPair(CurrencyPair.BTC_CNY);
 				j2sql.InsertOrderBook(data, exchange.getClass().getSimpleName());
 				Thread.sleep(100);
 				if (cnt > 10) {

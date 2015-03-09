@@ -47,6 +47,11 @@ public class Omni {
 		return orderBook;
 	}
 	
+public static boolean PlaceOrder(CurrencyPair pair) {
+		
+		return false;		
+	}
+	
 	
 }
 

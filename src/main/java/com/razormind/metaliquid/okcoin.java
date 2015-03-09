@@ -38,9 +38,9 @@ public class okcoin implements IExchangeRequest {
     @GET
     @Produces(MediaType.APPLICATION_JSON)
     @Path("orderbook")
-    public String getOrderBook() throws IOException {    	
+    public OrderBook getOrderBook() throws IOException {    	
     	OrderBook orderBook = OkCoin.GetOrderBook(CurrencyPair.BTC_USD); 
-    	return ToJson(orderBook);    	
+    	return orderBook;    	
     }
     
     public OrderBook getOrderBookObj() throws IOException {
@@ -51,18 +51,18 @@ public class okcoin implements IExchangeRequest {
     @GET
     @Produces(MediaType.APPLICATION_JSON)
     @Path("orderbook_cny")
-    public String getOrderBookCny() throws IOException {    	
+    public OrderBook getOrderBookCny() throws IOException {    	
     	OrderBook orderBook = OkCoin.GetOrderBook(CurrencyPair.BTC_CNY); 
-    	return ToJson(orderBook);    	
+    	return orderBook;    	
     }
     
     @POST
     @Path("orderbook")
     @Produces(MediaType.APPLICATION_JSON)
     @Consumes(MediaType.APPLICATION_JSON)
-    public String getOrderBookForPair(CurrencyPair pair) throws IOException {    	
+    public OrderBook getOrderBookForPair(CurrencyPair pair) throws IOException {    	
     	OrderBook orderBook = OkCoin.GetOrderBook(pair);   	
-    	return ToJson(orderBook);    	
+    	return orderBook;    	
     }
     
     private String ToJson(Object obj) throws JsonProcessingException {

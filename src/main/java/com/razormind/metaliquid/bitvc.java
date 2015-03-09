@@ -38,9 +38,9 @@ public class bitvc implements IExchangeRequest {
     @GET
     @Produces(MediaType.APPLICATION_JSON)
     @Path("orderbook")
-    public String getOrderBook() throws IOException {    	
+    public OrderBook getOrderBook() throws IOException {    	
     	OrderBook orderBook = BitVc.GetOrderBook(CurrencyPair.BTC_USD);   	
-    	return ToJson(orderBook);    	
+    	return orderBook;    	
     }
     
     public OrderBook getOrderBookObj() throws IOException {
@@ -52,9 +52,9 @@ public class bitvc implements IExchangeRequest {
     @Path("orderbook")
     @Produces(MediaType.APPLICATION_JSON)
     @Consumes(MediaType.APPLICATION_JSON)
-    public String getOrderBookForPair(CurrencyPair pair) throws IOException {    	
+    public OrderBook getOrderBookForPair(CurrencyPair pair) throws IOException {    	
     	OrderBook orderBook = BitVc.GetOrderBook(pair);   	
-    	return ToJson(orderBook);    	
+    	return orderBook;    	
     }
     
     private String ToJson(Object obj) throws JsonProcessingException {

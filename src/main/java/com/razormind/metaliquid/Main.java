@@ -56,6 +56,7 @@ public class Main {
     	DbThread bitvcThread = new DbThread( bitvc.class);
     	DbThread okcoinThread = new DbThread( okcoin.class);
     	Purger purgeThread = new Purger();
+    	Recycler recyclerThread = new Recycler();
     	
     	purgeThread.start();
     	bitstampThread.start();

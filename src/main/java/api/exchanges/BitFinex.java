@@ -27,4 +27,9 @@ public class BitFinex {
 		OrderBook orderBook = marketDataService.getOrderBook(pair);
 		return orderBook;
 	}
+	
+	public static boolean PlaceOrder(CurrencyPair pair) {
+		
+		return false;		
+	}
 }
