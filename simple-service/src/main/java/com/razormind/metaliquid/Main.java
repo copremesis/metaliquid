@@ -46,8 +46,10 @@ public class Main {
      * Main method.
      * @param args
      * @throws IOException
+     * @throws InterruptedException 
      */
-    public static void main(String[] args) throws IOException {
+    public static void main(String[] args) throws IOException, InterruptedException {
+    	try {
     	 _server = startServer();
          System.out.println(String.format("Jersey app started with WADL available at "
                  + "%sapplication.wadl\nHit enter to stop it...", BASE_URI));
@@ -75,7 +77,11 @@ public class Main {
     	threads.add(bitvcThreadUsd);
     	threads.add(okcoinThreadUsd);
     	threads.add(bitvcThreadCny);
-    	threads.add(okcoinThreadCny);
+    	threads.add(okcoinThreadCny); }
+    	catch(OutOfMemoryError e) {
+    		System.out.println("============================--OOPS--=============");
+    		new AppServices().restartApplication();
+    	}
     }
     
     

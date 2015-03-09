@@ -194,7 +194,10 @@ public class J2Sql {
 			while (rs.next()) {
 				JsonObject obj = new JsonObject();
 				for (int i = 1; i <= rs.getMetaData().getColumnCount(); i++) {
-					obj.addProperty(rs.getMetaData().getColumnName(i).toString(), rs.getObject(i).toString());
+					String value = "";
+					if (rs.getObject(i) != null)
+						value = rs.getObject(i).toString();
+					obj.addProperty(rs.getMetaData().getColumnName(i).toString(), value);
 				}
 				results.add(obj.toString());
 			}

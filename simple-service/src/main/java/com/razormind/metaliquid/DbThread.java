@@ -1,6 +1,7 @@
 package com.razormind.metaliquid;
 
 import java.io.IOException;
+
 import com.xeiam.xchange.currency.CurrencyPair;
 import com.xeiam.xchange.dto.marketdata.OrderBook;
 
@@ -30,9 +31,14 @@ class DbThread implements Runnable {
 				j2sql.InsertOrderBook(data, exchange.getClass().getSimpleName(), _pair);
 				Thread.sleep(100);				
 			}
-		} catch (InterruptedException | InstantiationException
+		} catch (OutOfMemoryError | InterruptedException | InstantiationException
 				| IllegalAccessException | ClassNotFoundException | IOException e) {
 			System.out.println("Thread " + threadTarget + " interrupted.");
+			try {
+				new AppServices().restartApplication();
+			} catch (InterruptedException e1) {
+				e1.printStackTrace();
+			}
 		}
 		System.out.println("Thread " + threadTarget + " exiting.");
 	}
