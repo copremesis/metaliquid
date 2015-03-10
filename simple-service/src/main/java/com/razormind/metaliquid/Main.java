@@ -23,7 +23,7 @@ import java.util.List;
  */
 public class Main {
     // Base URI the Grizzly HTTP server will listen on
-    public static final String BASE_URI = "http://127.0.0.1:8082/MetaLiquid/";
+    public static final String BASE_URI = "http://0.0.0.0:8082/MetaLiquid/";
     static HttpServer _server = new HttpServer();
     public static List<DbThread> threads = new ArrayList<DbThread>();
     
