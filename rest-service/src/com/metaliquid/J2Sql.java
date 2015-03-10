@@ -184,6 +184,7 @@ public class J2Sql {
 	}
 	
 	public List<String> runQuery(String query) {
+		System.out.println(query);
 		List<String> results = new ArrayList<String>();
 		try {
 			Statement st = conn.createStatement();

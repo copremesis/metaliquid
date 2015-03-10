@@ -59,6 +59,58 @@ public class StatsController {
 		J2Sql sql = J2Sql.getInstance();
 		return sql.runQuery(q).toString();
 	}
+	
+	/************* Stats By Shannon Code ***************/
+	
+	@GET
+	@Produces(MediaType.APPLICATION_JSON)
+	@Path("/book/recent/{n}/{exchange}")
+	public String recentNByExchange(
+			@PathParam("n") int n,
+			@PathParam("exchange") String exchange) {
+		J2Sql sql = J2Sql.getInstance();
+		String query = "select * from (select * from book order by id desc) as i where exchange = '"+exchange+"' order by id desc limit "+n;
+		return sql.runQuery(query).toString();
+	}
+	
+	@GET
+	@Produces(MediaType.APPLICATION_JSON)
+	@Path("/book/recent")
+	public String recent() {
+		J2Sql sql = J2Sql.getInstance();
+		String query = "select * from (select * from book order by id desc) as i group by i.exchange, pair";
+		return sql.runQuery(query).toString();
+	}
+	
+	@GET
+	@Produces(MediaType.APPLICATION_JSON)
+	@Path("/book/total/bypair")
+	public String totalByPair() {
+		J2Sql sql = J2Sql.getInstance();
+		String query = "SELECT count(*) totalBooks, pair e FROM metaliquid.book group by pair, e";
+		return sql.runQuery(query).toString();
+	}
+	
+	@GET
+	@Produces(MediaType.APPLICATION_JSON)
+	@Path("/book/total/byexchange")
+	public String totalByExchange() {
+		J2Sql sql = J2Sql.getInstance();
+		String query = "SELECT count(*) totalBooks, `exchange` e FROM metaliquid.book group by e";
+		return sql.runQuery(query).toString();
+	}
+	
+	@GET
+	@Produces(MediaType.APPLICATION_JSON)
+	@Path("/book/total")
+	public String totalBooks() {
+		J2Sql sql = J2Sql.getInstance();
+		String query = "SELECT count(*) totalBooks FROM metaliquid.book";
+		return sql.runQuery(query).toString();
+	}
+	
+	
+	/************* Stats By Shannon Code ***************/
 
 	private Stats computeDescriptiveStats(List<Double> values) {
 		Stats stats = new Stats();
@@ -71,7 +123,6 @@ public class StatsController {
 		}
 		stats.mean = sum / values.size();
 		stats.count = values.size();
-//		System.out.println(stats);
 		return stats;
 	}
 
