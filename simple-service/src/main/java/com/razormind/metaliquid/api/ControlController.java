@@ -73,7 +73,7 @@ public class ControlController {
 	@Path("/restart")
 	public String Restart() throws InterruptedException {
 		System.out.println("restarting");
-		new AppServices().restartApplication();
+		new AppServices().restartApplicationGone();
 		return "{response: \"OK\"}";
 	}
 	

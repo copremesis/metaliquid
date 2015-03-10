@@ -11,6 +11,8 @@ import com.xeiam.xchange.currency.CurrencyPair;
 import java.io.File;
 import java.io.IOException;
 import java.lang.reflect.Array;
+import java.lang.reflect.InvocationTargetException;
+import java.net.BindException;
 import java.net.URI;
 import java.util.ArrayList;
 import java.util.List;
@@ -31,15 +33,19 @@ public class Main {
     /**
      * Starts Grizzly HTTP server exposing JAX-RS resources defined in this application.
      * @return Grizzly HTTP server.
+     * @throws InterruptedException 
      */
-    public static HttpServer startServer() {
+    public static HttpServer startServer() throws InvocationTargetException, BindException {
         // create a resource config that scans for JAX-RS resources and providers
         // in com.example package
         final ResourceConfig rc = new ResourceConfig(ControlController.class);
-        
-        // create and start a new instance of grizzly http server
-        // exposing the Jersey application at BASE_URI
-        return GrizzlyHttpServerFactory.createHttpServer(URI.create(BASE_URI), rc);
+        try {
+        	return GrizzlyHttpServerFactory.createHttpServer(URI.create(BASE_URI), rc);
+        } catch(Exception e) {
+        	System.out.println("Here it is");
+        	return new HttpServer();
+        }
+       
     }
 
     /**
@@ -61,7 +67,6 @@ public class Main {
     	DbThread okcoinThreadUsd = new DbThread( okcoin.class);
     	DbThread okcoinThreadCny = new DbThread( okcoin.class);
     	Purger purgeThread = new Purger();
-    	Recycler recyclerThread = new Recycler();
     	
     	purgeThread.start();
     	bitstampThread.start();
@@ -70,7 +75,7 @@ public class Main {
     	okcoinThreadUsd.start();
     	bitvcThreadCny.start(CurrencyPair.BTC_CNY);
     	okcoinThreadCny.start(CurrencyPair.BTC_CNY);
-    	recyclerThread.start();
+    	
     	
     	threads.add(bitstampThread);
     	threads.add(bitfinexThread);
@@ -78,10 +83,15 @@ public class Main {
     	threads.add(okcoinThreadUsd);
     	threads.add(bitvcThreadCny);
     	threads.add(okcoinThreadCny); }
-    	catch(OutOfMemoryError e) {
+    	catch(OutOfMemoryError | InvocationTargetException | BindException e) {
     		System.out.println("============================--OOPS--=============");
-    		new AppServices().restartApplication();
+    		new AppServices().freememory();
+    		System.exit(0);
+    	} finally {
+    		System.out.println("============================--FINALLY--=============");
+    		
     	}
+    	
     }
     
     

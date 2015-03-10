@@ -29,16 +29,26 @@ class DbThread implements Runnable {
 				}
 				OrderBook data = exchange.getOrderBookForPair(_pair);
 				j2sql.InsertOrderBook(data, exchange.getClass().getSimpleName(), _pair);
-				Thread.sleep(100);				
+							
 			}
-		} catch (OutOfMemoryError | InterruptedException | InstantiationException
-				| IllegalAccessException | ClassNotFoundException | IOException e) {
-			System.out.println("Thread " + threadTarget + " interrupted.");
+		} catch (OutOfMemoryError | InstantiationException
+				| IllegalAccessException | ClassNotFoundException | IOException  e) {
+				System.out.println("Thread " + threadTarget + " interrupted.");
+				e.printStackTrace();
+				System.out.println("restarting");
+				System.exit(0);
+				
+				/*try {
+					new AppServices().restartApplication();
+				} catch (InterruptedException | OutOfMemoryError e2) {
+					System.out.println("Found it.");
+					e2.printStackTrace();
+				}
 			try {
 				new AppServices().restartApplication();
 			} catch (InterruptedException e1) {
 				e1.printStackTrace();
-			}
+			}*/
 		}
 		System.out.println("Thread " + threadTarget + " exiting.");
 	}

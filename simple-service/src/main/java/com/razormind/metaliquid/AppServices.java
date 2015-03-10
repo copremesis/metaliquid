@@ -7,8 +7,10 @@ import com.razormind.metaliquid.api.StreamGobbler;
 public class AppServices {
 	Process p;
 	boolean debug = false;
-	public boolean restartApplication( ) throws InterruptedException  
+	public boolean restartApplicationGone( ) throws InterruptedException  
 	{  
+		freememory();
+		freememory();
 	    String javaBin = System.getProperty("java.home") + "/bin/java";  
 	    File jarFile; 
 	    File profiler;
@@ -51,8 +53,15 @@ public class AppServices {
 	        //return false;  
 	    }  
 	    
-	    System.exit(0);  
+	    System.exit(0);
+
+		Thread.sleep(8000);	
 	  
 	    return true;  
 	}  
+	
+	public void freememory(){
+	    Runtime basurero = Runtime.getRuntime(); 
+	    basurero.gc();
+	}
 }
