@@ -1,0 +1,38 @@
+
+body {
+    font: 13px Helvetica, arial, freesans, clean, sans-serif;
+    line-height: 1.4;
+    color: #333333;
+    background: #fff;
+    padding: 50px;
+}
+
+#info {
+    font-size:32px;
+    color:#000;
+    text-shadow:#444 1px 1px 2px;
+    text-align:right;
+    text-transform:lowercase;
+    margin:20px 10px;
+}
+
+#tail {
+    border:1px solid #444;
+    overflow-x:hidden;
+    overflow-y:auto;
+    background-color:#333;
+    color:#EEE;
+    text-shadow:#000 0 0 2px;
+    heigtrebuchetfont-family:"Trebuchet MS","Lucida Sans Unicode","Lucida Grande","Lucida Sans",Arial,sans-serif;
+}
+
+.monospace {
+    font-family:Monaco,"Bitstream Vera Sans Mono","Lucida Console",Terminal,monospace;
+}
+
+.selection::selection,.selection ::selection,.selection::-moz-selection,.selection ::-moz-selection {
+    background:#EEE;
+    color:#000;
+    text-shadow:#fff 0 0 2px;
+    border-color:#000;
+}
