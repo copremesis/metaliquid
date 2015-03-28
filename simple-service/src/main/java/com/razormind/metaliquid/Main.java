@@ -14,6 +14,7 @@ import java.lang.reflect.Array;
 import java.lang.reflect.InvocationTargetException;
 import java.net.BindException;
 import java.net.URI;
+import java.sql.SQLException;
 import java.util.ArrayList;
 import java.util.List;
 
@@ -23,7 +24,7 @@ import java.util.List;
  */
 public class Main {
     // Base URI the Grizzly HTTP server will listen on
-    public static final String BASE_URI = "http://0.0.0.0:8082/MetaLiquid/";
+    public static final String BASE_URI = "http://0.0.0.0:8085/MetaLiquid/";
     static HttpServer _server = new HttpServer();
     public static List<DbThread> threads = new ArrayList<DbThread>();
     
@@ -42,7 +43,6 @@ public class Main {
         try {
         	return GrizzlyHttpServerFactory.createHttpServer(URI.create(BASE_URI), rc);
         } catch(Exception e) {
-        	System.out.println("Here it is");
         	return new HttpServer();
         }
        
@@ -53,9 +53,10 @@ public class Main {
      * @param args
      * @throws IOException
      * @throws InterruptedException 
+     * @throws SQLException 
      */
     public static void main(String[] args) throws IOException, InterruptedException {
-    	try {
+    	try {    		 		
     	 _server = startServer();
          System.out.println(String.format("Jersey app started with WADL available at "
                  + "%sapplication.wadl\nHit enter to stop it...", BASE_URI));
@@ -87,7 +88,7 @@ public class Main {
     		System.out.println("============================--OOPS--=============");
     		new AppServices().freememory();
     		System.exit(0);
-    	} finally {
+    	}  finally {
     		System.out.println("============================--FINALLY--=============");
     		
     	}

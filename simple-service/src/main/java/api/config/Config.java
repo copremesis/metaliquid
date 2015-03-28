@@ -6,6 +6,7 @@ import com.xeiam.xchange.Exchange;
 import com.xeiam.xchange.ExchangeFactory;
 import com.xeiam.xchange.ExchangeSpecification;
 import com.xeiam.xchange.service.polling.PollingMarketDataService;
+import com.xeiam.xchange.service.polling.PollingTradeService;
 
 public class Config {
 	
@@ -45,5 +46,9 @@ public class Config {
 	
 	public static PollingMarketDataService PollingServiceInstance(Class makeFrom) {			
 		return ExchangeInstance(makeFrom).getPollingMarketDataService();
+	}
+	
+	public static PollingTradeService PollingTradeServiceInstance(Class makeFrom) {			
+		return ExchangeInstance(makeFrom).getPollingTradeService();
 	}
 }
