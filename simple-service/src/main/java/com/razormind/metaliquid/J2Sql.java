@@ -1,10 +1,14 @@
 package com.razormind.metaliquid;
 
+import java.nio.ByteBuffer;
 import java.sql.*;
 import java.util.ArrayList;
 import java.util.List;
+import java.util.regex.Matcher;
+import java.util.regex.Pattern;
 
 import com.google.gson.JsonObject;
+import com.google.gson.JsonParser;
 import com.xeiam.xchange.currency.CurrencyPair;
 import com.xeiam.xchange.dto.Order.OrderType;
 import com.xeiam.xchange.dto.marketdata.OrderBook;
@@ -34,7 +38,7 @@ public class J2Sql {
 			System.out.println("Connecting to DB @ " + url);
 			Class.forName(driver).newInstance();
 			conn = DriverManager
-					.getConnection(url + dbName, userName, password);
+					.getConnection(url + dbName + "?allowMultiQueries=true", userName, password);
 
 		} catch (Exception e) {
 			e.printStackTrace();
@@ -58,7 +62,7 @@ public class J2Sql {
 			} else {
 				System.out.println("----------SKIPPING--------"
 						+ _book.getTimeStamp() + ", " + _exchange);
-			}
+			}			
 		} catch (Exception e) {
 			System.out.println("SQL + inserting orderbook FAIL " + _exchange);
 			e.printStackTrace();
@@ -66,10 +70,33 @@ public class J2Sql {
 		freememory();
 		freememory();
 	}
-	public void freememory(){
-	    Runtime basurero = Runtime.getRuntime(); 
-	    basurero.gc();
+	
+	private void UpdateBookMarkComplete(int bookId) throws SQLException {
+		String bookQuery = "UPDATE `metaliquid`.`book` SET `complete`='1' WHERE `id`=?;";
+		PreparedStatement preparedStmt = null;
+		try {
+			System.out.println("SQL + updating book " + bookId + " marking complete");
+			preparedStmt = conn.prepareStatement(bookQuery);
+			preparedStmt.setInt(1, bookId);
+			System.out.println("SQL > update: "+preparedStmt);
+			preparedStmt.executeUpdate();				
+		} catch (SQLException e ) {
+	        e.printStackTrace();
+	        if (conn != null) {
+	            try {
+	                System.out.println("Transaction is being rolled back");
+	                conn.rollback();
+	            } catch(SQLException excep) {
+	                excep.printStackTrace();
+	            }
+	        }
+		} finally {
+	        if (preparedStmt != null) {
+	        	preparedStmt.close();
+	        }
+	    } 
 	}
+
 	private int InsertBook(OrderBook book, String exchange, CurrencyPair pair) throws SQLException {
 		String bookQuery = "insert into metaliquid.book (timeStamp, exchange, pair) values (?, ?, ?)";
 		int bookId = 0;
@@ -123,6 +150,7 @@ public class J2Sql {
 	private void InsertOrder(OrderBook book, OrderType type, int bookId, CurrencyPair pair)
 			throws SQLException {
 		String orderQuery = "insert into metaliquid.order (bookId, type, tradableAmount, currencyPair, pairId, timestamp, limitPrice) values (?, ?, ?, ?, ?, ?, ?)";
+		int cnt = 0;
 		for (LimitOrder order : book.getOrders(type)) {
 			PreparedStatement preparedStmt = null;
 			try {
@@ -144,11 +172,14 @@ public class J2Sql {
 				}
 				preparedStmt.setBigDecimal(7, order.getLimitPrice());
 				preparedStmt.execute();
+				cnt++;
 
 			} catch (SQLException e) {
 				System.err.println(preparedStmt);
 				e.printStackTrace();
 			}
+			if (cnt == book.getOrders(type).size() && type == OrderType.BID)
+				UpdateBookMarkComplete(bookId);
 		}
 	}
 
@@ -181,6 +212,115 @@ public class J2Sql {
 		} catch (Exception e) {
 			e.printStackTrace();
 		}
+	}
+	
+	public String PaternReplace(String toReplace, String what, String with) {
+		 Pattern p = Pattern.compile(what);
+		 Matcher m = p.matcher(toReplace);
+		 StringBuffer sb = new StringBuffer();
+		 while (m.find()) {
+		     m.appendReplacement(sb, with);
+		 }
+		 m.appendTail(sb);
+		 String retVal = sb.toString();
+		 System.out.println(retVal);
+		 return retVal;
+	}
+	
+	public List<String> runStoredQuery(int queryId, String[] params) {
+		List<String> results = new ArrayList<String>();
+		List<String> map = getParametersForStoredQuerySet(queryId);
+		List<String> queries = getRawQuerySet(queryId);
+		for (String q : queries ) {
+			String query = InjectParametersIntoSqlStatement(params, map, q);
+			JsonParser parser = new JsonParser();
+			JsonObject o = (JsonObject)parser.parse(query);
+			query = o.get("rawQuery").toString().replace("\"", "");
+			try {
+					Statement st = conn.createStatement();
+					ResultSet rs = st.executeQuery(query);
+					
+					while (rs.next()) {
+						JsonObject obj = new JsonObject();
+						for (int i = 1; i <= rs.getMetaData().getColumnCount(); i++) {
+							obj.addProperty(rs.getMetaData().getColumnName(i).toString(), rs.getObject(i).toString());
+						}
+						results.add(obj.toString());
+					}
+						
+			} catch (Exception e) {
+				e.printStackTrace();
+			}
+		}
+		System.out.println(results);
+		return results;
+	}
+	public void runStoredProc() throws SQLException {
+		CallableStatement cStmt = conn.prepareCall("{call new_procedure()}");
+		//cStmt.registerOutParameter(1, Types.VARCHAR);
+		boolean hadResults = cStmt.execute();
+		ResultSet rs = cStmt.getResultSet();
+		if (hadResults) {
+			 String foo = "";
+		}
+		
+	}
+	private String InjectParametersIntoSqlStatement(String[] params, List<String> map, String query) {
+		int idx = 0;
+		for (String param : map) {
+			JsonParser parser = new JsonParser();
+			JsonObject o = (JsonObject)parser.parse(param);
+			query = PaternReplace(query, o.get("param").toString(), params[idx]);
+			idx++;
+		}
+		return query;
+	}
+	
+	public List<String> getRawQuerySet(int id) {
+		List<String> results = new ArrayList<String>();
+		String rawQuery = "select * from storedquery where queryset = "+id;
+		try {
+			Statement st = conn.createStatement();
+			ResultSet rs = st.executeQuery(rawQuery);
+			System.out.println("==============================");
+			System.out.println(rawQuery);
+			System.out.println("==============================");
+			
+			while (rs.next()) {
+				JsonObject obj = new JsonObject();
+				for (int i = 1; i <= rs.getMetaData().getColumnCount(); i++) {
+					obj.addProperty(rs.getMetaData().getColumnName(i).toString(), rs.getObject(i).toString());
+				}
+				results.add(obj.toString());
+			}
+		} catch (Exception e) {
+			e.printStackTrace();
+		}
+		System.out.println(results);
+		return results;
+	}
+
+	public List<String> getParametersForStoredQuerySet(int id) {
+		List<String> results = new ArrayList<String>();
+		String paramQuery = "SELECT paramname, param FROM parameter_storedqueryjoin j join parameter p on p.id = j.parameterid where storedquerysetid = "+id;
+		try {
+			Statement st = conn.createStatement();
+			ResultSet rs = st.executeQuery(paramQuery);
+			System.out.println("==============================");
+			System.out.println(rs.toString());
+			System.out.println("==============================");
+			while (rs.next()) {
+				JsonObject obj = new JsonObject();
+				for (int i = 1; i <= rs.getMetaData().getColumnCount(); i++) {
+					obj.addProperty(rs.getMetaData().getColumnName(i).toString(), rs.getObject(i).toString());
+				}
+				results.add(obj.toString());
+			}
+		} catch (Exception e) {
+			e.printStackTrace();
+		}
+		System.out.println(results);
+		return results;
 	}
 	
 	public List<String> runQuery(String query) {
@@ -258,5 +398,11 @@ public class J2Sql {
 	
 		Main.threads.forEach((thread) -> thread.start());
 		return "{success: 'ok'}";
+	}
+	
+
+	public void freememory(){
+	    Runtime basurero = Runtime.getRuntime(); 
+	    basurero.gc();
 	}
 }
